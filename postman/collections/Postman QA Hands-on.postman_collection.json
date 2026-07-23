@@ -1,0 +1,447 @@
+{
+  "info": {
+    "_postman_id": "5beed35c-dd04-4827-b240-aaba9da7782d",
+    "name": "Postman QA Hands-on",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "item": [
+    {
+      "name": "01 Login - Valid",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "id": "cbdc77c1-5964-49dc-a08f-35f671048804",
+            "exec": [
+              "pm.test(\"Status code is 200\", function () {\r",
+              "    pm.response.to.have.status(200);\r",
+              "});\r",
+              "\r",
+              "pm.test(\"Response is JSON\", function () {\r",
+              "    pm.response.to.be.json;\r",
+              "});\r",
+              "\r",
+              "pm.test(\"Access token is returned\", function () {\r",
+              "    const jsonData = pm.response.json();\r",
+              "\r",
+              "    pm.expect(jsonData.accessToken).to.be.a(\"string\");\r",
+              "    pm.expect(jsonData.accessToken).to.not.be.empty;\r",
+              "});\r",
+              "\r",
+              "pm.test(\"User details are returned\", function () {\r",
+              "    const jsonData = pm.response.json();\r",
+              "\r",
+              "    pm.expect(jsonData.id).to.be.a(\"number\");\r",
+              "    pm.expect(jsonData.username).to.equal(\"emilys\");\r",
+              "    pm.expect(jsonData.email).to.include(\"@\");\r",
+              "});\r",
+              "\r",
+              "pm.test(\"Response time is below 2000ms\", function () {\r",
+              "    pm.expect(pm.response.responseTime).to.be.below(2000);\r",
+              "});\r",
+              "\r",
+              "const jsonData = pm.response.json();\r",
+              "\r",
+              "pm.environment.set(\r",
+              "    \"accessToken\",\r",
+              "    jsonData.accessToken\r",
+              ");"
+            ],
+            "type": "text/javascript",
+            "packages": {},
+            "requests": {}
+          }
+        }
+      ],
+      "id": "bb1964f6-4e81-47f4-b92d-46f7301e6411",
+      "request": {
+        "method": "POST",
+        "header": [],
+        "body": {
+          "mode": "raw",
+          "raw": "{\r\n    \"username\": \"emilys\",\r\n    \"password\": \"emilyspass\",\r\n    \"expiresInMins\": 30\r\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "{{baseUrl}}/auth/login",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "auth",
+            "login"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "02 Login - Invalid",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "id": "57a2c184-35eb-4101-98d6-a018cdfeacbe",
+            "exec": [
+              "pm.test(\"Invalid login is rejected\", function () {\r",
+              "    pm.expect(pm.response.code).to.be.oneOf([\r",
+              "        400,\r",
+              "        401\r",
+              "    ]);\r",
+              "});\r",
+              "\r",
+              "pm.test(\"Error message is returned\", function () {\r",
+              "    const jsonData = pm.response.json();\r",
+              "\r",
+              "    pm.expect(jsonData.message).to.be.a(\"string\");\r",
+              "    pm.expect(jsonData.message).to.not.be.empty;\r",
+              "});\r",
+              "\r",
+              "pm.test(\"Access token is not returned\", function () {\r",
+              "    const jsonData = pm.response.json();\r",
+              "\r",
+              "    pm.expect(jsonData.accessToken).to.not.exist;\r",
+              "});"
+            ],
+            "type": "text/javascript",
+            "packages": {},
+            "requests": {}
+          }
+        }
+      ],
+      "id": "cf89714e-15f5-4d79-8a83-38464f40ccdc",
+      "request": {
+        "method": "POST",
+        "header": [],
+        "body": {
+          "mode": "raw",
+          "raw": "{\r\n  \"username\": \"emilys\",\r\n  \"password\": \"wrong-password\"\r\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "{{baseUrl}}/auth/login",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "auth",
+            "login"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "03 Get Current User",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "id": "e4ba9c82-31b4-4a22-9a96-83194dcaca93",
+            "exec": [
+              "pm.test(\"Status code is 200\", function () {\r",
+              "    pm.response.to.have.status(200);\r",
+              "});\r",
+              "\r",
+              "pm.test(\"Authenticated user is returned\", function () {\r",
+              "    const jsonData = pm.response.json();\r",
+              "\r",
+              "    pm.expect(jsonData.username).to.equal(\"emilys\");\r",
+              "    pm.expect(jsonData.id).to.be.a(\"number\");\r",
+              "});\r",
+              "\r",
+              "pm.test(\"Check whether password is exposed\", function () {\r",
+              "    const jsonData = pm.response.json();\r",
+              "\r",
+              "    console.log(\r",
+              "        \"Password field exposed:\",\r",
+              "        Object.prototype.hasOwnProperty.call(\r",
+              "            jsonData,\r",
+              "            \"password\"\r",
+              "        )\r",
+              "    );\r",
+              "});"
+            ],
+            "type": "text/javascript",
+            "packages": {},
+            "requests": {}
+          }
+        }
+      ],
+      "id": "d4c2bc94-5e49-44af-9cfa-4299adb52d0e",
+      "request": {
+        "auth": {
+          "type": "bearer",
+          "bearer": [
+            {
+              "key": "token",
+              "value": "{{accessToken}}",
+              "type": "string"
+            }
+          ]
+        },
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{baseUrl}}/auth/me",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "auth",
+            "me"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "04 Get Product",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "id": "fee467f1-762c-4508-865b-9bd855c977d3",
+            "exec": [
+              "pm.test(\"Status code is 200\", function () {\r",
+              "    pm.response.to.have.status(200);\r",
+              "});\r",
+              "\r",
+              "pm.test(\"Product ID matches request\", function () {\r",
+              "    const jsonData = pm.response.json();\r",
+              "\r",
+              "    pm.expect(jsonData.id).to.equal(\r",
+              "        Number(pm.environment.get(\"productId\"))\r",
+              "    );\r",
+              "});\r",
+              "\r",
+              "pm.test(\"Required product fields exist\", function () {\r",
+              "    const jsonData = pm.response.json();\r",
+              "\r",
+              "    pm.expect(jsonData).to.have.property(\"id\");\r",
+              "    pm.expect(jsonData).to.have.property(\"title\");\r",
+              "    pm.expect(jsonData).to.have.property(\"price\");\r",
+              "    pm.expect(jsonData).to.have.property(\"category\");\r",
+              "});\r",
+              "\r",
+              "pm.test(\"Product field types are correct\", function () {\r",
+              "    const jsonData = pm.response.json();\r",
+              "\r",
+              "    pm.expect(jsonData.id).to.be.a(\"number\");\r",
+              "    pm.expect(jsonData.title).to.be.a(\"string\");\r",
+              "    pm.expect(jsonData.price).to.be.a(\"number\");\r",
+              "});"
+            ],
+            "type": "text/javascript",
+            "packages": {},
+            "requests": {}
+          }
+        }
+      ],
+      "id": "c77ecd51-4fd8-40ac-a616-abe45e7281b2",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{baseUrl}}/products/{{productId}}",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "products",
+            "{{productId}}"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "05 Search Products",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "id": "41dbcba7-d956-475d-9d50-cbd509248cdb",
+            "exec": [
+              "pm.test(\"Status code is 200\", function () {\r",
+              "    pm.response.to.have.status(200);\r",
+              "});\r",
+              "\r",
+              "pm.test(\"Products array is returned\", function () {\r",
+              "    const jsonData = pm.response.json();\r",
+              "\r",
+              "    pm.expect(jsonData.products).to.be.an(\"array\");\r",
+              "});\r",
+              "\r",
+              "pm.test(\"Search result contains products\", function () {\r",
+              "    const jsonData = pm.response.json();\r",
+              "\r",
+              "    pm.expect(jsonData.products.length)\r",
+              "        .to.be.greaterThan(0);\r",
+              "});\r",
+              "\r",
+              "pm.test(\"Pagination fields exist\", function () {\r",
+              "    const jsonData = pm.response.json();\r",
+              "\r",
+              "    pm.expect(jsonData).to.have.property(\"total\");\r",
+              "    pm.expect(jsonData).to.have.property(\"skip\");\r",
+              "    pm.expect(jsonData).to.have.property(\"limit\");\r",
+              "});"
+            ],
+            "type": "text/javascript",
+            "packages": {},
+            "requests": {}
+          }
+        }
+      ],
+      "id": "76735295-b95b-4b1c-9882-3e76e71ec373",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{baseUrl}}/products/search?q=phone",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "products",
+            "search"
+          ],
+          "query": [
+            {
+              "key": "q",
+              "value": "phone"
+            }
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "06 Add Product",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "id": "5616ea17-68d0-4fcb-9ffd-4af0694e01b7",
+            "exec": [
+              "pm.test(\"Product creation is accepted\", function () {\r",
+              "    pm.expect(pm.response.code).to.be.oneOf([\r",
+              "        200,\r",
+              "        201\r",
+              "    ]);\r",
+              "});\r",
+              "\r",
+              "pm.test(\"Created product matches request\", function () {\r",
+              "    const jsonData = pm.response.json();\r",
+              "\r",
+              "    pm.expect(jsonData.title)\r",
+              "        .to.equal(\"QA Test Product\");\r",
+              "\r",
+              "    pm.expect(jsonData.price)\r",
+              "        .to.equal(99.9);\r",
+              "\r",
+              "    pm.expect(jsonData.id)\r",
+              "        .to.be.a(\"number\");\r",
+              "});"
+            ],
+            "type": "text/javascript",
+            "packages": {},
+            "requests": {}
+          }
+        }
+      ],
+      "id": "59bac901-c031-4402-ae66-2032393aedff",
+      "request": {
+        "method": "POST",
+        "header": [],
+        "body": {
+          "mode": "raw",
+          "raw": "{\r\n  \"title\": \"QA Test Product\",\r\n  \"description\": \"Created through Postman hands-on\",\r\n  \"price\": 99.9,\r\n  \"category\": \"testing\"\r\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "{{baseUrl}}/products/add",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "products",
+            "add"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "07 Update Product",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "id": "fd334a20-064d-4636-93a7-770e86be62a8",
+            "exec": [
+              "pm.test(\"Status code is 200\", function () {\r",
+              "    pm.response.to.have.status(200);\r",
+              "});\r",
+              "\r",
+              "pm.test(\"Updated fields are returned\", function () {\r",
+              "    const jsonData = pm.response.json();\r",
+              "\r",
+              "    pm.expect(jsonData.id).to.equal(\r",
+              "        Number(pm.environment.get(\"productId\"))\r",
+              "    );\r",
+              "\r",
+              "    pm.expect(jsonData.title)\r",
+              "        .to.equal(\"Updated QA Product\");\r",
+              "\r",
+              "    pm.expect(jsonData.price)\r",
+              "        .to.equal(129.9);\r",
+              "});"
+            ],
+            "type": "text/javascript",
+            "packages": {},
+            "requests": {}
+          }
+        }
+      ],
+      "id": "6b19ee18-f00f-4785-a2df-b4cacb259639",
+      "request": {
+        "method": "PUT",
+        "header": [],
+        "body": {
+          "mode": "raw",
+          "raw": "{\r\n  \"title\": \"Updated QA Product\",\r\n  \"price\": 129.9\r\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": {
+          "raw": "{{baseUrl}}/products/{{productId}}",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "products",
+            "{{productId}}"
+          ]
+        }
+      },
+      "response": []
+    }
+  ]
+}
