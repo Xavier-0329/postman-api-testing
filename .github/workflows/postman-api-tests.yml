@@ -1,0 +1,35 @@
+name: Postman API Tests
+
+on:
+  push:
+    branches:
+      - main
+
+  pull_request:
+    branches:
+      - main
+
+  workflow_dispatch:
+
+jobs:
+  api-tests:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+
+      - name: Install Newman
+        run: npm install --global newman
+
+      - name: Run Postman collection
+        run: |
+          newman run "postman/collections/Postman QA Hands-on.postman_collection.json" \
+            -e "postman/environments/DummyJSON QA.postman_environment.json" \
+            --env-var "baseUrl=https://dummyjson.com" \
+            --env-var "productId=1"
